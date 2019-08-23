@@ -1,0 +1,12 @@
+-   config:
+        base_url: ''
+        name: baidu
+-   test:
+        name: baidu
+        request:
+            method: GET
+            url: https://www.baidu.com
+        validate:
+        -   check: status_code
+            comparator: equals
+            expect: 200

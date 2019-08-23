@@ -1,0 +1,12 @@
+-   config:
+        base_url: ''
+        name: test
+-   test:
+        name: test
+        request:
+            method: GET
+            url: https://httpbin.org/ip
+        validate:
+        -   check: status_code
+            comparator: equals
+            expect: 200
