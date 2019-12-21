@@ -5,7 +5,7 @@ from httpapitest.models import Project,Module,DebugTalk,TestConfig, TestCase, Te
 from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator
 from .utils import config_logic, case_logic, get_time_stamp,timestamp_to_datetime
-from .utils import env_data_logic, add_suite_data,edit_suite_data,get_total_values,upload_file_logic,task_logic
+from .utils import env_data_logic,get_total_values,upload_file_logic,task_logic
 from httprunner.api import HttpRunner
 from .runner import run_test_by_type,run_by_single,run_by_batch
 from .tasks import main_hrun
@@ -34,7 +34,7 @@ def index(request):
     project_length = Project.objects.count()
     module_length = Module.objects.count()
     test_length = TestCase.objects.count()
-    suite_length = TestSuite.objects.count()
+    
     
 
     total = get_total_values()
@@ -42,7 +42,6 @@ def index(request):
         'project_length': project_length,
         'module_length': module_length,
         'test_length': test_length,
-        'suite_length': suite_length,
         'total': total
     }
 
@@ -619,6 +618,7 @@ def test_run(request):
         type = request.POST.get('type', 'test')
 
         run_test_by_type(id, base_url, testcase_dir_path, type)
+        
         runner.run(testcase_dir_path)
         #shutil.rmtree(testcase_dir_path)
         summary = timestamp_to_datetime(runner._summary, type=False)
@@ -705,90 +705,6 @@ def env_set(request):
         return render(request, 'env_list.html')
 
 
-def suite_list(request):
-    if request.method == "GET":
-        
-        projects = Project.objects.all().order_by("-update_time")
-        project_name = request.GET.get('project','All')
-        env = Env.objects.all()
-        name = request.GET.get('name', '套件名称')
-        info = {'belong_project': project_name, 'name':name}
-        if project_name != "All":
-            belong_project = Project.objects.get(project_name=project_name)
-            rs = TestSuite.objects.filter(belong_project=belong_project)
-        elif name != "套件名称":
-            rs = TestSuite.objects.filter(suite_name=name)
-        else:
-            rs = projects
-        rs = TestSuite.objects.all().order_by("-update_time")
-        paginator = Paginator(rs,5)
-        page = request.GET.get('page')
-        objects = paginator.get_page(page)
-        context_dict = {'suite': objects, 'info': info, 'project': projects, 'env': env }
-        return render(request,"suite_list.html",context_dict)
-
-@csrf_exempt
-@login_check
-def suite_add(request):
-    if request.is_ajax():
-        kwargs = json.loads(request.body.decode('utf-8'))
-        msg = add_suite_data(**kwargs)
-        if msg == 'ok':
-            return HttpResponse(reverse('suite_list'))
-        else:
-            return HttpResponse(msg)
-
-    elif request.method == 'GET':
-        context_dict = {
-            'project': Project.objects.all().values('project_name').order_by('-create_time')
-        }
-        return render(request, 'suite_add.html', context_dict)
-
-@csrf_exempt
-@login_check
-def suite_edit(request, id=None):
-    if request.is_ajax():
-        kwargs = json.loads(request.body.decode('utf-8'))
-        msg = edit_suite_data(**kwargs)
-        if msg == 'ok':
-            return HttpResponse(reverse('suite_list'))
-        else:
-            return HttpResponse(msg)
-    info = suite_info = TestSuite.objects.get(id=id)
-    context_dict = {
-        'project': Project.objects.all().values('project_name').order_by('-create_time'),
-        'info': info
-    }
-    return render(request, 'suite_edit.html', context_dict)
-
-
-@csrf_exempt
-@login_check
-def suite_delete(request):
-    if request.is_ajax():
-        data = json.loads(request.body.decode('utf-8'))
-        case_id = data.get('id')
-        case = TestSuite.objects.get(id=case_id)
-        case.delete()
-        return HttpResponse(reverse('suite_list'))
-
-
-@csrf_exempt
-@login_check
-def suite_search_ajax(request):
-    if request.is_ajax():
-        data = json.loads(request.body.decode('utf-8'))
-        if 'crontab' in data.keys():
-            project = data["crontab"]["name"]["project"]
-            
-        if   project != "请选择":
-            p = Project.objects.get(project_name=project)
-            suites = TestSuite.objects.filter(belong_project=p)
-            suite_list = ['%d^=%s' % (c.id, c.suite_name) for c in suites ]
-            suite_string = 'replaceFlag'.join(suite_list)
-            return HttpResponse(suite_string)
-        else:
-            return HttpResponse('')
 
 @login_check
 def report_list(request):

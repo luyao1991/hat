@@ -455,41 +455,10 @@ def env_data_logic(**kwargs):
             return '更新失败，请重试'
 
 
-def add_suite_data(**kwargs):
-    belong_project = kwargs.pop('project')
-    suite_name = kwargs.get('suite_name')
-    kwargs['belong_project'] = Project.objects.get(project_name=belong_project)
-
-    try:
-        if TestSuite.objects.filter(belong_project__project_name=belong_project, suite_name=suite_name).count() > 0:
-            return 'Suite已存在, 请重新命名'
-        TestSuite.objects.create(**kwargs)
-        logging.info('suite添加成功: {kwargs}'.format(kwargs=kwargs))
-    except Exception:
-        return 'suite添加异常，请重试'
-    return 'ok'
 
 
-def edit_suite_data(**kwargs):
-    id = kwargs.pop('id')
-    project_name = kwargs.pop('project')
-    suite_name = kwargs.get('suite_name')
-    include = kwargs.pop('include')
-    belong_project = Project.objects.get(project_name=project_name)
 
-    suite_obj = TestSuite.objects.get(id=id)
-    try:
-        if suite_name != suite_obj.suite_name and \
-                TestSuite.objects.filter(belong_project=belong_project, suite_name=suite_name).count() > 0:
-            return 'Suite已存在, 请重新命名'
-        suite_obj.suite_name = suite_name
-        suite_obj.belong_project = belong_project
-        suite_obj.include = include
-        suite_obj.save()
-        logging.info('suite更新成功: {kwargs}'.format(kwargs=kwargs))
-    except Exception:
-        return 'suite添加异常，请重试'
-    return 'ok'
+
 
 
 def add_test_reports(summary, report_name=None):

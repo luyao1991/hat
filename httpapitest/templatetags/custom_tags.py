@@ -44,10 +44,9 @@ def id_del(value):
 def project_sum(pro_name):
    
     module_count = str(Module.objects.filter(belong_project__project_name__exact=pro_name).count())
-    suite_count = str(TestSuite.objects.filter(belong_project__project_name__exact=pro_name).count())
     test_count = str(TestCase.objects.filter(belong_project__exact=pro_name).count())
     config_count = str(TestConfig.objects.filter(belong_project__exact=pro_name).count())
-    sum = module_count + '/ ' + suite_count + '/' + test_count + '/ ' + config_count
+    sum = module_count + '/ ' + '/' + test_count + '/ ' + config_count
     return sum
 
 

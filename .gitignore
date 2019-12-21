@@ -1,0 +1,11 @@
+.idea/
+venv/
+*.pyc
+hat/reports/
+hat/suite/
+.vscode/settings.json
+*.log
+test
+reports
+suite
+
