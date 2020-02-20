@@ -84,8 +84,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'hat',  # 新建数据库名
-        'USER': 'root',  # 数据库登录名
-        'PASSWORD': '',  # 数据库登录密码
+        'USER': 'hatuser',  # 数据库登录名
+        'PASSWORD': 'hat2019',  # 数据库登录密码
         'HOST': '127.0.0.1',  # 数据库所在服务器ip地址
         'PORT': '3306',  # 监听端口 默认3306即可
         }
